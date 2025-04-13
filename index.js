@@ -11,24 +11,17 @@ function toggleFavorite(button, meal) {
     (item) => item.idMeal === meal.idMeal
   );
   if (mealIndex !== -1) {
-    // Meal is already in the list, remove it
     selectedMeals.splice(mealIndex, 1);
   } else {
-    // Add meal to the list
     selectedMeals.push(meal);
   }
-
-  // Toggle the selected state of the meal in the mealsData array
   const mealDataIndex = mealsData.findIndex(
     (item) => item.idMeal === meal.idMeal
   );
   if (mealDataIndex !== -1) {
     mealsData[mealDataIndex].selected = !mealsData[mealDataIndex].selected;
   }
-
-  // Store only the selectedMeals array in localStorage
   localStorage.setItem("selectedMeals", JSON.stringify(selectedMeals));
-
   if (displayingSelected) {
     displaySelectedMeals();
   } else {
@@ -41,18 +34,14 @@ function removeFromSelectedMeals(meal) {
     (item) => item.idMeal === meal.idMeal
   );
   if (mealIndex !== -1) {
-    // Remove meal from the list
     selectedMeals.splice(mealIndex, 1);
-    // Update mealsData to mark the meal as not selected
     const mealDataIndex = mealsData.findIndex(
       (item) => item.idMeal === meal.idMeal
     );
     if (mealDataIndex !== -1) {
       mealsData[mealDataIndex].selected = false;
     }
-    // Store the updated selectedMeals array in localStorage
     localStorage.setItem("selectedMeals", JSON.stringify(selectedMeals));
-    // Refresh the display of selected meals
     displaySelectedMeals();
   }
 }
@@ -82,7 +71,7 @@ function displaySelectedMeals() {
   const removeFromListButtons = document.querySelectorAll(".removeFromList");
   removeFromListButtons.forEach((button, index) => {
     button.addEventListener("click", (event) => {
-      event.stopPropagation(); // Prevent event bubbling
+      event.stopPropagation();
       const selectedMeal = selectedMeals[index];
       removeFromSelectedMeals(selectedMeal);
       console.log("Selected Meals:", selectedMeals);
@@ -92,10 +81,10 @@ function displaySelectedMeals() {
   const viewDetailsButtons = document.querySelectorAll(".viewDetails");
   viewDetailsButtons.forEach((button, index) => {
     button.addEventListener("click", (event) => {
-      event.stopPropagation(); // Prevent event bubbling
+      event.stopPropagation();
       const selectedMeal = selectedMeals[index];
       fetchMealDetails(selectedMeal.idMeal);
-      searchInput.disabled = true; // Disable the input field when viewing meal details
+      searchInput.disabled = true;
     });
   });
 }
@@ -107,14 +96,12 @@ function fetchMealDetails(mealId) {
     .then((response) => response.json())
     .then((data) => {
       if (data.meals === null) {
-        // Handle error when meal details are not found
         console.error("Meal details not found.");
         return;
       }
 
       const mealDetails = data.meals[0];
 
-      // Display the meal details in the mealDisplay div
       const mealDetailsHTML = `
         <div class="mealDetails">
           <img src="${mealDetails.strMealThumb}" alt="${mealDetails.strMeal}">
@@ -171,7 +158,6 @@ function fetchMeals(value) {
       if (data.meals === null) {
         mealDisplay.innerHTML = "<h2>No meals found.</h2>";
       } else {
-        // Store the fetched data along with the selected state in mealsData array
         mealsData = data.meals.map((meal) => ({
           ...meal,
           selected: selectedMeals.some(
@@ -214,10 +200,10 @@ function fetchMeals(value) {
         const viewDetailsButtons = document.querySelectorAll(".viewDetails");
         viewDetailsButtons.forEach((button, index) => {
           button.addEventListener("click", (event) => {
-            event.stopPropagation(); // Prevent event bubbling
+            event.stopPropagation();
             const selectedMeal = mealsData[index];
             fetchMealDetails(selectedMeal.idMeal);
-            searchInput.disabled = true; // Disable the input field when viewing meal details
+            searchInput.disabled = true;
           });
         });
       }
@@ -229,18 +215,59 @@ function fetchMeals(value) {
     });
 }
 
+function fetchRandomMeals(count = 10) {
+  mealDisplay.innerHTML = "<p>Loading  meals...</p>";
+  const promises = [];
+  for (let i = 0; i < count; i++) {
+    promises.push(fetch("https://www.themealdb.com/api/json/v1/1/random.php").then(res => res.json()));
+  }
+
+  Promise.all(promises)
+    .then(results => {
+      const randomMeals = results.map(r => r.meals[0]);
+      mealsData = randomMeals.map(meal => ({
+        ...meal,
+        selected: selectedMeals.some(selected => selected.idMeal === meal.idMeal)
+      }));
+
+      const mealHTML = mealsData.map(meal => `
+        <div class="meal">
+          <img src="${meal.strMealThumb}" alt="${meal.strMeal}">
+          <div class="wrapper">
+            <h3>${meal.strMeal.length > 10 ? meal.strMeal.slice(0, 10) + "..." : meal.strMeal}</h3>
+            <button class="addToList ${meal.selected ? "selected" : ""}"><i class="fa-solid fa-heart fav"></i></button>
+            <button class="viewDetails"><i class="fa-solid fa-eye"></i></button>
+          </div>
+        </div>
+      `).join("");
+
+      mealDisplay.innerHTML = mealHTML;
+
+      document.querySelectorAll(".addToList").forEach((button, index) => {
+        button.addEventListener("click", () => toggleFavorite(button, mealsData[index]));
+      });
+
+      document.querySelectorAll(".viewDetails").forEach((button, index) => {
+        button.addEventListener("click", () => fetchMealDetails(mealsData[index].idMeal));
+      });
+    })
+    .catch(error => {
+      console.error("Failed to fetch random meals", error);
+      mealDisplay.innerHTML = "<p>Error loading random meals.</p>";
+    });
+}
+
 function handleToggleSelectedClick() {
-  displayingSelected = !displayingSelected; // Toggle the display state
+  displayingSelected = !displayingSelected;
   if (displayingSelected) {
     displaySelectedMeals();
-    searchInput.disabled = true; // Disable the input field when showing selected meals
+    searchInput.disabled = true;
   } else {
     fetchMeals(searchInput.value.trim());
-    searchInput.disabled = false; // Enable the input field when showing fetched meals
+    searchInput.disabled = false;
   }
 }
 
-// Event listeners
 searchInput.addEventListener("input", (event) => {
   const inputValue = event.target.value.trim();
   fetchMeals(inputValue);
@@ -250,11 +277,10 @@ toggleSelectedButton.addEventListener("click", handleToggleSelectedClick);
 
 document.addEventListener("click", (event) => {
   if (event.target.classList.contains("goBackButton")) {
-    // Go back to the fetched data page
     fetchMeals(searchInput.value.trim());
     searchInput.disabled = false;
   }
 });
 
-// Fetch initial data on page load
-fetchMeals("");
+// Fetch 10 random meals by default
+fetchRandomMeals(15);
