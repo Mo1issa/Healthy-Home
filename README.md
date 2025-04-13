@@ -8,18 +8,19 @@ Group Members :
 ### 🥗 **Healthy Home: Empowering Better Eating Habits**
 
 **Healthy Home** is a modern web-based application designed to help individuals make healthier food choices effortlessly. In a world filled with fast food and busy schedules, maintaining a nutritious diet can be challenging. That’s where Healthy Home comes in.
-
-We built **Healthy Home** to simplify the discovery of **delicious, nutritious meals** using the free and community-powered **[TheMealDB API](https://www.themealdb.com/api.php)**. The app generates **random healthy meal suggestions**, allows users to **search for meals**, **view full recipes**, and even **save their favorites** for later.
+Healthy food is what constitutes a healthier lifestyle.we have made healthy eating easy by providing you with an easy-to-use platform where you can discover new, healthy meals every day—neither by random selection nor as a search-based outcome. Whether you are interested in clean eating, meal prep, or simply browsing new recipe inspiration, we have features in our app that will make it easy and fun. With features like improved meal views, calorie tracking (via CalorieNinjas), preferred saving, and the ease of interface, people can enjoy a smooth healthy cooking experience.
+We built **Healthy Home** to simplify the discovery of **delicious, nutritious meals** using the free and community-powered **[TheMealDB API](https://www.themealdb.com/api.php)**. The app generates **healthy meal suggestions**, allows users to **search for meals**, **view full recipes**, and even **save their favorites** for later also calculate the meal calories!!!(by CalorieNinjas api ).
 
 ### 💡 Why we use it
 
 - To **encourage healthier lifestyles** through meal inspiration
 - To provide a **quick and interactive way** to discover new dishes
 - To promote **meal diversity** beyond everyday eating habits
+- To have a **healthy meal** with well known calories.
 
 ### 🛠️ What it does
 
-- Fetches and displays **10–12 random meals** on page load
+- Fetches and displays **default meals** on page load
 - Allows users to **search meals by name**
 - Provides **detailed recipe instructions**, ingredients, and YouTube tutorials
 - Lets users **mark favorite meals** and view them later
@@ -29,12 +30,16 @@ We built **Healthy Home** to simplify the discovery of **delicious, nutritious m
 
 A food-related API is a database that contains a broad range of information about food nutrition, ingredients, and preparation. Using this tool, a developer can create a website or app that analyzes restaurant menus, promotes healthy eating, or even helps a user find the ingredients for a new recipe.
 
+# CalorieNinjas-API
+
+The CalorieNinjas API is a lightweight RESTful API that allows you to quickly get nutritional information for common foods and ingredients. By sending a food name or a sentence (e.g., "1 cup rice" or "2 eggs and toast"), the API returns data like: Calories, Protein ,Fat ,Carbohydrates, Serving size estimates It’s great for building meal planners, diet trackers, or fitness apps because it’s: Simple to use (just a single GET request) Doesn’t require a complex payload like Edamam Fast and beginner-friendly
+
 ### Key Features:
 
 - Displays **10-12 random meals** by default
 - Search meals by name
 - Add meals to your **favorites list**
-- View **detailed instructions and ingredients**
+- View **detailed instructions and ingredients also calories in each meal**
 - Navigate easily through **Home**, **About**, and **Contact Us** pages
 
 ### ▶️ How to Run
@@ -54,6 +59,7 @@ A food-related API is a database that contains a broad range of information abou
 ## 🔗 API Used
 
 - [TheMealDB API](https://www.themealdb.com/api.php)
+- [CalorieNinjas ](https://api.calorieninjas.com/api.php)
 
 ---
 
