@@ -36,7 +36,7 @@ The CalorieNinjas API is a lightweight RESTful API that allows you to quickly ge
 
 ### Key Features:
 
-- Displays **10-12 random meals** by default
+- Displays **15 random meals** by default
 - Search meals by name
 - Add meals to your **favorites list**
 - View **detailed instructions and ingredients also calories in each meal**
