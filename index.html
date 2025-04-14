@@ -1,13 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <script src="https://kit.fontawesome.com/5abe21094e.js" crossorigin="anonymous"></script>
-  <link rel="stylesheet" href="index.css">
+  <link rel="stylesheet" href="index.css" />
   <title>Healthy Home</title>
 </head>
 <body>
+  <!-- Navbar -->
   <nav class="navbar">
     <div class="navbar-container">
       <div class="navbar-brand">Healthy Home</div>
@@ -19,17 +20,35 @@
     </div>
   </nav>
 
+  <!-- Hero message -->
   <blockquote class="content">
-    <h2>Healthy food for healthy lifestyle</h2>
+    <h2>Healthy food for a healthy lifestyle</h2>
   </blockquote>
 
+  <!-- Meal Search -->
   <div class="mealSearch">
-    <input type="text" id="searchInput" placeholder="Search for meals...">
-    <button class="toggleSelectedButton"><i class="fa-solid fa-bookmark favorite"></i></button>
+    <input
+      type="text"
+      id="searchInput"
+      placeholder="Search for meals..."
+      aria-label="Search for meals"
+    />
+    <button
+      class="toggleSelectedButton"
+      aria-label="Toggle Saved Meals"
+      title="View Saved Meals"
+    >
+      <i class="fa-solid fa-bookmark favorite"></i>
+    </button>
   </div>
 
-  <div class="mealDisplay"></div>
+  <!-- Meal Display Section -->
+  <section class="mealDisplay" aria-live="polite"></section>
 
+  <!-- Optional modal or alerts container -->
+  <div id="modalContainer" style="display: none;"></div>
+
+  <!-- Footer -->
   <footer>
     <div class="footer">
       <p>Healthy Home &copy; 2023</p>

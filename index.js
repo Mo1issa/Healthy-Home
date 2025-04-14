@@ -9,23 +9,36 @@ const CALORIE_NINJAS_API_KEY = "aLngFOkC/xVIKLHDRe8muQ==avYp6lLPZ4MCSzKG"; // Re
 let mealsData = [];
 let selectedMeals = JSON.parse(localStorage.getItem("selectedMeals")) || [];
 let displayingSelected = false;
-
 function toggleFavorite(button, meal) {
-  const mealIndex = selectedMeals.findIndex((item) => item.idMeal === meal.idMeal);
+  const mealIndex = selectedMeals.findIndex(
+    (item) => item.idMeal === meal.idMeal
+  );
   if (mealIndex !== -1) {
+    // Meal is already in the list, remove it
     selectedMeals.splice(mealIndex, 1);
   } else {
+    // Add meal to the list
     selectedMeals.push(meal);
   }
 
-  const mealDataIndex = mealsData.findIndex((item) => item.idMeal === meal.idMeal);
+  // Toggle the selected state of the meal in the mealsData array
+  const mealDataIndex = mealsData.findIndex(
+    (item) => item.idMeal === meal.idMeal
+  );
   if (mealDataIndex !== -1) {
     mealsData[mealDataIndex].selected = !mealsData[mealDataIndex].selected;
   }
 
+  // Store only the selectedMeals array in localStorage
   localStorage.setItem("selectedMeals", JSON.stringify(selectedMeals));
-  displayingSelected ? displaySelectedMeals() : fetchMeals(searchInput.value.trim());
+
+  if (displayingSelected) {
+    displaySelectedMeals();
+  } else {
+    fetchMeals(searchInput.value.trim());
+  }
 }
+
 
 function removeFromSelectedMeals(meal) {
   const mealIndex = selectedMeals.findIndex((item) => item.idMeal === meal.idMeal);
@@ -36,7 +49,7 @@ function removeFromSelectedMeals(meal) {
       mealsData[mealDataIndex].selected = false;
     }
     localStorage.setItem("selectedMeals", JSON.stringify(selectedMeals));
-    displaySelectedMeals();
+    displaySelectedMealsFavorites();
   }
 }
 
@@ -164,7 +177,42 @@ function fetchRandomMeals(count = 15) {
   for (let i = 0; i < count; i++) {
     promises.push(fetch("https://www.themealdb.com/api/json/v1/1/random.php").then(res => res.json()));
   }
-
+  function displaySelectedMeals() {
+    const selectedMeals = JSON.parse(localStorage.getItem("selectedMeals")) || [];
+  
+    if (selectedMeals.length === 0) {
+      mealDisplay.innerHTML = "<h2>No saved meals found.</h2>";
+      return;
+    }
+  
+    const savedHTML = selectedMeals.map((meal) => `
+      <div class="meal">
+        <img src="${meal.strMealThumb}" alt="${meal.strMeal}">
+        <div class="wrapper">
+          <h3>${meal.strMeal.length > 10 ? meal.strMeal.slice(0, 10) + "..." : meal.strMeal}</h3>
+          <button class="removeFromList"><i class="fa-solid fa-trash-can fav"></i></button>
+          <button class="viewDetails"><i class="fa-solid fa-eye"></i></button>
+        </div>
+      </div>`).join("");
+  
+    mealDisplay.innerHTML = savedHTML;
+  
+    document.querySelectorAll(".removeFromList").forEach((button, index) => {
+      button.addEventListener("click", () => {
+        removeFromSelectedMeals(selectedMeals[index]);
+      });
+    });
+  
+    document.querySelectorAll(".viewDetails").forEach((button, index) => {
+      button.addEventListener("click", () => {
+        fetchMealDetails(selectedMeals[index].idMeal);
+        searchInput.disabled = true;
+      });
+    });
+  }
+  
+  
+  
   Promise.all(promises)
     .then(results => {
       const randomMeals = results.map(r => r.meals[0]);
@@ -202,15 +250,58 @@ function fetchRandomMeals(count = 15) {
     });
 }
 
+
 function handleToggleSelectedClick() {
-  displayingSelected = !displayingSelected;
+  displayingSelected = !displayingSelected; // Toggle the display state
   if (displayingSelected) {
-    displaySelectedMeals();
-    searchInput.disabled = true;
+    displaySelectedMealsFavorites();
+    searchInput.disabled = true; // Disable the input field when showing selected meals
   } else {
     fetchMeals(searchInput.value.trim());
-    searchInput.disabled = false;
+    searchInput.disabled = false; // Enable the input field when showing fetched meals
   }
+}
+function displaySelectedMealsFavorites() {
+  const selectedMealHTML = selectedMeals
+    .map(
+      (meal) => `
+        <div class="meal">
+          <img src="${meal.strMealThumb}" alt="${meal.strMeal}">
+          <div class="wrapper">
+            <h3>${
+              meal.strMeal.length > 10
+                ? meal.strMeal.slice(0, 10) + "..."
+                : meal.strMeal
+            }</h3>
+            <button class="removeFromList selected"><i class="fa-solid fa-heart fav"></i></button>
+            <button class="viewDetails"><i class="fa-solid fa-eye"></i></button>
+          </div>
+        </div>
+      `
+    )
+    .join("");
+
+  mealDisplay.innerHTML = selectedMealHTML;
+
+  const removeFromListButtons = document.querySelectorAll(".removeFromList");
+  removeFromListButtons.forEach((button, index) => {
+    button.addEventListener("click", (event) => {
+      event.stopPropagation(); // Prevent event bubbling
+      const selectedMeal = selectedMeals[index];
+      removeFromSelectedMeals(selectedMeal);
+      console.log("Selected Meals:", selectedMeals);
+    });
+  });
+
+  const viewDetailsButtons = document.querySelectorAll(".viewDetails");
+  viewDetailsButtons.forEach((button, index) => {
+    button.addEventListener("click", (event) => {
+      event.stopPropagation(); // Prevent event bubbling
+      const selectedMeal = selectedMeals[index];
+      fetchMealDetails(selectedMeal.idMeal);
+      searchInput.disabled = true; // Disable the input field when viewing meal details
+    });
+  });
 }
 
 searchInput.addEventListener("input", (event) => {
@@ -218,7 +309,9 @@ searchInput.addEventListener("input", (event) => {
   fetchMeals(inputValue);
 });
 
-toggleSelectedButton.addEventListener("click", handleToggleSelectedClick);
+toggleSelectedButton.addEventListener("click", () => {
+  displaySelectedMealsFavorites(); // 👈 Show saved meals
+});
 
 document.addEventListener("click", (event) => {
   if (event.target.classList.contains("goBackButton")) {
